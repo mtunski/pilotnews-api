@@ -2,8 +2,7 @@ require 'sinatra'
 require 'json'
 require 'active_record'
 
-require 'story'
-
+require_relative 'story'
 
 class App < Sinatra::Base
   def initialize
@@ -12,7 +11,7 @@ class App < Sinatra::Base
     super
   end
 
-  get '/' do ENV['DATABASE_URL'].to_json end
+  get '/' do '' end
 
   get '/api/stories' do
     content_type :json
