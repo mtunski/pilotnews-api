@@ -4,13 +4,9 @@ require 'active_record'
 
 require_relative 'story'
 
+ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
+
 class App < Sinatra::Base
-  def initialize
-    ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
-
-    super
-  end
-
   get '/' do '' end
 
   get '/api/stories' do
