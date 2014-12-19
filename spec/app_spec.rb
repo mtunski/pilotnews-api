@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'app'
 
 describe App do
-  let(:app) { App.new }
+  let(:app) { Rack::Lint.new(App.new) }
 
   it 'returns a successful response' do
     get '/'
