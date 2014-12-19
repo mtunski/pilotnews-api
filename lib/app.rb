@@ -1,10 +1,17 @@
 require 'sinatra'
 require 'json'
 require 'dotenv'
+require 'active_record'
 
 Dotenv.load(".env.#{settings.environment}")
 
 class App < Sinatra::Base
+  def initialize
+    ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
+
+    super
+  end
+
   get '/' do '' end
 
   get '/api/stories' do
