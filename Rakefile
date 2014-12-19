@@ -8,12 +8,13 @@ RSpec::Core::RakeTask.new(:spec) do |task|
 end
 
 namespace :db do
-  desc 'Migrate the database (options: VERSION=x, VERBOSE=false).'
+  desc 'Migrate the database.'
   task migrate: :configure_connection do
     ActiveRecord::Migration.verbose = true
-    ActiveRecord::Migrator.migrate 'db/migrate', ENV['VERSION'] ? ENV['VERSION'].to_i : nil
+    ActiveRecord::Migrator.migrate 'db/migrate'
   end
 
+  desc 'Rolls the schema back to the previous version (specify steps w/ STEP=n).'
   task rollback: :configure_connection do
     step = ENV['STEP'] ? ENV['STEP'].to_i : 1
     ActiveRecord::Migrator.rollback 'db/migrate', step
