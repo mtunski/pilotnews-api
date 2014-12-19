@@ -2,6 +2,9 @@ require 'sinatra'
 require 'json'
 require 'active_record'
 
+require 'story'
+
+
 class App < Sinatra::Base
   def initialize
     ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])

@@ -6,6 +6,11 @@ describe App do
   let(:story1) { { id: 1, title: 'Story 1', url: 'http://www.lipsum.com/' } }
   let(:story2) { { id: 2, title: 'Story 2', url: 'http://www.lipsum.com/' } }
 
+  before do
+    app
+    Story.create!(id: 1, title: 'Lorem ipsum', url: 'http://www.lipsum.com/')
+  end
+
   it 'returns a successful response' do
     get '/'
     expect(last_response).to be_ok
