@@ -1,5 +1,8 @@
 require 'sinatra'
 require 'json'
+require 'dotenv'
+
+Dotenv.load(".env.#{settings.environment}")
 
 class App < Sinatra::Base
   get '/' do '' end
