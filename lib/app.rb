@@ -1,9 +1,6 @@
 require 'sinatra'
 require 'json'
-require 'dotenv'
 require 'active_record'
-
-Dotenv.load(".env.#{settings.environment}")
 
 class App < Sinatra::Base
   def initialize
@@ -12,7 +9,7 @@ class App < Sinatra::Base
     super
   end
 
-  get '/' do '' end
+  get '/' do ENV['DATABASE_URL'].to_json end
 
   get '/api/stories' do
     content_type :json
