@@ -1,11 +1,8 @@
 require 'rspec/core/rake_task'
-require 'dotenv'
 require 'active_record'
+require 'dotenv'
 
-RSpec::Core::RakeTask.new(:spec) do |task|
-  task.rspec_opts = '--color'
-  task.verbose    = false
-end
+RSpec::Core::RakeTask.new(:spec)
 
 namespace :db do
   desc 'Migrate the database.'
@@ -25,6 +22,6 @@ namespace :db do
   end
 
   task :environment do
-    ENV['ENV'] == 'development' || !ENV['ENV'] ? Dotenv.load : Dotenv.load(".env.#{ENV['ENV']}")
+    Dotenv.load(".env.#{ENV['ENV']}", '.env')
   end
 end
