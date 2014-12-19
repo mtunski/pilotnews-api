@@ -3,6 +3,8 @@ require 'app'
 
 describe App do
   let(:app) { Rack::Lint.new(App.new) }
+  let(:story1) { { id: 1, title: 'Story 1', url: 'http://www.lipsum.com/' } }
+  let(:story2) { { id: 2, title: 'Story 2', url: 'http://www.lipsum.com/' } }
 
   it 'returns a successful response' do
     get '/'
@@ -10,19 +12,23 @@ describe App do
   end
 
   it 'GET /api/stories returns all submitted stories' do
-    skip
-
     get '/api/stories'
     expect(last_response.status).to eq(200)
+    expect(last_response.body).to eq({
+      story1: story1,
+      story2: story2
+    }.to_json)
   end
 
-  it 'GET /api/stories/:id returns single story' do
-    skip
-
-    story = {}
-
-    get "/api/stories/#{story.id}"
+  it 'GET /api/stories/:id returns single story if found' do
+    get "/api/stories/1"
     expect(last_response.status).to eq(200)
+    expect(last_response.body).to eq({story: story1}.to_json)
+  end
+
+  it 'GET /api/stories/:id returns 404 if not found' do
+    get "/api/stories/2"
+    expect(last_response.status).to eq(404)
   end
 
   it 'POST /api/stories creates a new story' do
