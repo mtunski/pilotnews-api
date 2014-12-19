@@ -13,7 +13,7 @@ describe App do
     skip
 
     get '/api/stories'
-    expect(last_response).to be_ok
+    expect(last_response.status).to eq(200)
   end
 
   it 'GET /api/stories/:id returns single story' do
@@ -22,7 +22,7 @@ describe App do
     story = {}
 
     get "/api/stories/#{story.id}"
-    expect(last_response).to be_ok
+    expect(last_response.status).to eq(200)
   end
 
   it 'POST /api/stories creates a new story' do
