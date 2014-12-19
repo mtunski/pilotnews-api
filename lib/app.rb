@@ -20,7 +20,7 @@ class App < Sinatra::Base
     content_type :json
 
     if params['id'] == '1'
-      { story: { id: 1, title: 'Story 1', url: 'http://www.lipsum.com/' } }.to_json(:root => true)
+      { story: { id: 1, title: 'Story 1', url: 'http://www.lipsum.com/' } }.to_json
     else
       status 404
     end
