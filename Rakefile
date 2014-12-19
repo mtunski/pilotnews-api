@@ -1,5 +1,5 @@
 require 'rspec/core/rake_task'
-require 'dotenv/tasks'
+require 'dotenv'
 require 'active_record'
 
 RSpec::Core::RakeTask.new(:spec) do |task|
@@ -20,7 +20,11 @@ namespace :db do
     ActiveRecord::Migrator.rollback 'db/migrate', step
   end
 
-  task configure_connection: :dotenv do
+  task configure_connection: :environment do
     ActiveRecord::Base.establish_connection ENV['DATABASE_URL']
+  end
+
+  task :environment do
+    ENV['ENV'] == 'development' || !ENV['ENV'] ? Dotenv.load : Dotenv.load(".env.#{ENV['ENV']}")
   end
 end
