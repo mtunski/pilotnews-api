@@ -1,3 +1,3 @@
-require File.expand_path('lib/app')
+require './lib/app'
 
 run App.new
