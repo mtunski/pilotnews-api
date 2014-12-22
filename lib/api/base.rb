@@ -13,6 +13,8 @@ module PilotNews
         Dotenv.load(".env.#{environment}", '.env')
         ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
 
+        use ActiveRecord::ConnectionAdapters::ConnectionManagement
+
         register Sinatra::Namespace
         helpers  Sinatra::JSON
       end
