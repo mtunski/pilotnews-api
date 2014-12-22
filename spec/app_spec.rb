@@ -12,6 +12,7 @@ describe PilotNews::API do
       run self
     end
   end
+  let(:resource_not_found) { { error: 'Resource not found' }.to_json }
 
   describe '::Stories' do
     let(:story_1) { Story.find(1) }
@@ -41,6 +42,7 @@ describe PilotNews::API do
     it 'GET /stories/:id returns 404 if not found' do
       get "/stories/0"
       expect(last_response.status).to eq(404)
+      expect(last_response.body).to eq(resource_not_found)
     end
 
     it 'POST /stories creates a new story' do
