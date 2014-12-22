@@ -1,8 +1,5 @@
-require 'dotenv'
 require 'rack/test'
 require 'database_cleaner'
-
-Dotenv.load('.env.test')
 
 ENV['RACK_ENV'] = 'test'
 
