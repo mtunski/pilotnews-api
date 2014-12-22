@@ -22,6 +22,6 @@ namespace :db do
   end
 
   task :environment do
-    Dotenv.load(".env.#{ENV['ENV']}", '.env')
+    Dotenv.load(".env.#{ENV['RACK_ENV']}", '.env')
   end
 end
