@@ -82,4 +82,13 @@ describe PilotNews::App do
     patch "/api/stories/#{story.id}/unvote"
     expect(last_response.status).to eq(204)
   end
+
+  it 'POST /api/users creates a new user' do
+    skip
+
+    user = {}
+
+    post '/api/users', { user: user }
+    expect(last_response.status).to eq(201)
+  end
 end
