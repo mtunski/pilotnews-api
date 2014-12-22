@@ -1,7 +1,3 @@
-require 'dotenv'
+require_relative 'lib/app'
 
-require './lib/app'
-
-Dotenv.load
-
-run App.new
+run PilotNews::App

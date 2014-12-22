@@ -1,27 +1,11 @@
 require 'sinatra'
-require 'json'
-require 'active_record'
 
-require_relative 'story'
+require_relative 'api/endpoints'
 
-ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
+module PilotNews
+  class App < Sinatra::Base
+    get '/' do 'PilotNews' end
 
-class App < Sinatra::Base
-  get '/' do '' end
-
-  get '/api/stories' do
-    content_type :json
-
-    Story.all.to_json
-  end
-
-  get '/api/stories/:id' do
-    content_type :json
-
-    Story.find(params[:id]).to_json
-  end
-
-  error ActiveRecord::RecordNotFound do
-    status 404
+    use API::Endpoints
   end
 end

@@ -1,8 +1,8 @@
 require 'spec_helper'
 require 'app'
 
-describe App do
-  let(:app) { Rack::Lint.new(App.new) }
+describe PilotNews::App do
+  let(:app)     { Rack::Lint.new(PilotNews::App) }
   let(:story_1) { Story.find(1) }
   let(:story_2) { Story.find(2) }
 
