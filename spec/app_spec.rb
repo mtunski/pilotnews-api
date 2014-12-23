@@ -64,30 +64,32 @@ describe PilotNews::API do
       expect(last_response.status).to eq(204)
     end
 
-    it 'PATCH /stories/:id/upvote upvotes a story' do
+    it 'PUT /stories/:id/vote upvotes a story' do
       skip
 
       story = {}
+      vote  = 1
 
-      patch "/stories/#{story.id}/upvote"
+      put "/stories/#{story.id}/vote", { vote: vote }
       expect(last_response.status).to eq(204)
     end
 
-    it 'PATCH /stories/:id/downvote downvotes a story' do
+    it 'PUT /stories/:id/vote downvotes a story' do
       skip
 
       story = {}
+      vote  = -1
 
-      patch "/stories/#{story.id}/downvote"
+      patch "/stories/#{story.id}/vote", { vote: vote }
       expect(last_response.status).to eq(204)
     end
 
-    it 'PATCH /stories/:id/unvote undoes the vote' do
+    it 'DELETE /stories/:id/vote undoes the vote' do
       skip
 
       story = {}
 
-      patch "/stories/#{story.id}/unvote"
+      delete "/stories/#{story.id}/vote"
       expect(last_response.status).to eq(204)
     end
   end
