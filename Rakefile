@@ -2,7 +2,11 @@ require 'rspec/core/rake_task'
 require 'active_record'
 require 'dotenv'
 
-RSpec::Core::RakeTask.new(:spec)
+task default: :spec
+
+RSpec::Core::RakeTask.new(:spec) do |task|
+  task.verbose = false
+end
 
 namespace :db do
   desc 'Migrate the database.'
