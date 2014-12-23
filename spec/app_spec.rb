@@ -19,8 +19,8 @@ describe PilotNews::API do
     let(:story_2) { Story.find(2) }
 
     before do
-      Story.create!(id: 1, title: 'Lorem ipsum', url: 'http://www.lipsum.com/')
-      Story.create!(id: 2, title: 'Dolor sit amet', url: 'http://www.dsitamet.com/')
+      Story.create!(title: 'Lorem ipsum', url: 'http://www.lipsum.com/')
+      Story.create!(title: 'Dolor sit amet', url: 'http://www.dsitamet.com/')
     end
 
     describe 'GET /stories' do
