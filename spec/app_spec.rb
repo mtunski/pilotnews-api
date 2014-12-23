@@ -23,26 +23,42 @@ describe PilotNews::API do
       Story.create!(id: 2, title: 'Dolor sit amet', url: 'http://www.dsitamet.com/')
     end
 
-    it 'GET /stories returns all submitted stories' do
-      get '/stories'
-      expect(last_response.status).to eq(200)
-      expect(last_response.body).to eq([story_1, story_2].to_json)
+    describe 'GET /stories' do
+      before { get '/stories' }
+
+      it 'responds with code 200' do
+        expect(last_response.status).to eq(200)
+      end
+
+      it 'returns all stories' do
+        expect(last_response.body).to eq([story_1, story_2].to_json)
+      end
     end
 
-    it 'GET /stories/:id returns single story if found' do
-      get "/stories/1"
-      expect(last_response.status).to eq(200)
-      expect(last_response.body).to eq(story_1.to_json)
+    describe 'GET /stories/:id' do
+      context 'story found' do
+        before { get '/stories/1' }
 
-      get "/stories/2"
-      expect(last_response.status).to eq(200)
-      expect(last_response.body).to eq(story_2.to_json)
-    end
+        it 'responds with code 200' do
+          expect(last_response.status).to eq(200)
+        end
 
-    it 'GET /stories/:id returns 404 if not found' do
-      get "/stories/0"
-      expect(last_response.status).to eq(404)
-      expect(last_response.body).to eq(resource_not_found)
+        it 'returns story with given id' do
+          expect(last_response.body).to eq(story_1.to_json)
+        end
+      end
+
+      context 'story not found' do
+        before { get '/stories/0' }
+
+        it 'responds with code 404' do
+          expect(last_response.status).to eq(404)
+        end
+
+        it 'returns proper error message' do
+          expect(last_response.body).to eq(resource_not_found)
+        end
+      end
     end
 
     it 'POST /stories creates a new story' do
