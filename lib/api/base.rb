@@ -24,6 +24,12 @@ module PilotNews
 
         halt 404, { error: 'Resource not found' }.to_json
       end
+
+      error ActiveRecord::RecordInvalid do
+        content_type :json
+
+        halt 422, { error: 'Resource invalid' }.to_json
+      end
     end
   end
 end
