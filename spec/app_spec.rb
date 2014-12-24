@@ -8,6 +8,7 @@ describe PilotNews::API do
       use Rack::Lint
       use Sinatra::Router do
         mount PilotNews::API::Stories
+        mount PilotNews::API::Users
       end
 
       run self
