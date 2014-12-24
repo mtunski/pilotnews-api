@@ -141,13 +141,45 @@ describe PilotNews::API do
   end
 
   describe '::Users' do
-    it 'POST /users creates a new user' do
-      skip
+    let(:valid_user) { { login: 'user', password: 'user' } }
+    let(:invalid_user) { { login: 'user', password: '1' } }
 
-      user = {}
+    describe 'POST /users' do
+      context 'user is valid' do
+        let(:request) { -> { post '/users', { user: valid_user } } }
+        let(:response) { request.call }
 
-      post '/users', { user: user }
-      expect(last_response.status).to eq(201)
+        it 'responds with code 201' do
+          expect(response.status).to eq(201)
+        end
+
+        it 'returns nothing' do
+          expect(response.body).to be_empty
+        end
+
+        it 'saves the user in the db' do
+          expect(request).to change{ User.count }.by(1)
+        end
+      end
+
+      context 'user is invalid' do
+        let(:request) { -> { post '/users', { user: invalid_user } } }
+        let(:response) { request.call }
+
+        before { User.create!(valid_user) }
+
+        it 'responds with code 422' do
+          expect(response.status).to eq(422)
+        end
+
+        it 'returns proper error message' do
+          expect(response.body).to eq(resource_invalid)
+        end
+
+        it 'does not save the user in the db' do
+          expect(request).not_to change{ User.count }
+        end
+      end
     end
   end
 end
