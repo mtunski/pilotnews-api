@@ -69,7 +69,7 @@ describe PilotNews::API do
         let(:request) { -> { post '/stories', { story: valid_story } } }
         let(:response) { request.call }
 
-        it 'responds with code 200' do
+        it 'responds with code 201' do
           expect(response.status).to eq(201)
         end
 
