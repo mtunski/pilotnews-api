@@ -12,6 +12,10 @@ module PilotNews
         get '/:id' do
           json Story.find(params[:id])
         end
+
+        post '' do
+          status 201 if Story.create!(params[:story])
+        end
       end
     end
   end
