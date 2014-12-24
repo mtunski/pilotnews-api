@@ -13,10 +13,13 @@ describe PilotNews::API do
     end
   end
   let(:resource_not_found) { { error: 'Resource not found' }.to_json }
+  let(:resource_invalid)   { { error: 'Resource invalid' }.to_json }
 
   describe '::Stories' do
     let(:story_1) { Story.find(1) }
     let(:story_2) { Story.find(2) }
+    let(:valid_story)   { { title: 'Valid Story', url: 'http://validurl.com' } }
+    let(:invalid_story) { { title: '', url: 'invalidurl' } }
 
     before do
       Story.create!(title: 'Lorem ipsum', url: 'http://www.lipsum.com/')
@@ -43,7 +46,7 @@ describe PilotNews::API do
           expect(last_response.status).to eq(200)
         end
 
-        it 'returns story with given id' do
+        it 'returns the story with given id' do
           expect(last_response.body).to eq(story_1.to_json)
         end
       end
@@ -61,13 +64,40 @@ describe PilotNews::API do
       end
     end
 
-    it 'POST /stories creates a new story' do
-      skip
+    describe 'POST /stories' do
+      context 'story is valid' do
+        let(:request) { -> { post '/stories', { story: valid_story } } }
+        let(:response) { request.call }
 
-      story = {}
+        it 'responds with code 200' do
+          expect(response.status).to eq(201)
+        end
 
-      post '/stories', { story: story }
-      expect(last_response.status).to eq(201)
+        it 'returns nothing' do
+          expect(response.body).to be_empty
+        end
+
+        it 'saves the story in the db' do
+          expect(request).to change{ Story.count }.by(1)
+        end
+      end
+
+      context 'story is invalid' do
+        let(:request) { -> { post '/stories', { story: invalid_story } } }
+        let(:response) { request.call }
+
+        it 'responds with code 422' do
+          expect(response.status).to eq(422)
+        end
+
+        it 'returns proper error message' do
+          expect(response.body).to eq(resource_invalid)
+        end
+
+        it 'does not save the story in the db' do
+          expect(request).not_to change{ Story.count }
+        end
+      end
     end
 
     it 'PATCH /stories/:id updates a story' do
