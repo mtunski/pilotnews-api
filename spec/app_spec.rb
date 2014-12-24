@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'api/stories'
+require 'api/users'
 
 describe PilotNews::API do
   let(:app) do
