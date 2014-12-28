@@ -20,8 +20,8 @@ describe PilotNews::API do
   describe '::Stories' do
     let(:story_1) { Story.find(1) }
     let(:story_2) { Story.find(2) }
-    let(:valid_story)   { { title: 'Valid Story', url: 'http://validurl.com' } }
-    let(:invalid_story) { { title: '', url: 'invalidurl' } }
+    let(:valid_story_attributes)   { { title: 'Valid Story', url: 'http://validurl.com' } }
+    let(:invalid_story_attributes) { { title: '', url: 'invalidurl' } }
 
     before do
       Story.create!(title: 'Lorem ipsum', url: 'http://www.lipsum.com/')
@@ -68,7 +68,7 @@ describe PilotNews::API do
 
     describe 'POST /stories' do
       context 'story is valid' do
-        let(:request) { -> { post '/stories', { story: valid_story } } }
+        let(:request) { -> { post '/stories', { story: valid_story_attributes } } }
         let(:response) { request.call }
 
         it 'responds with code 201' do
@@ -85,7 +85,7 @@ describe PilotNews::API do
       end
 
       context 'story is invalid' do
-        let(:request) { -> { post '/stories', { story: invalid_story } } }
+        let(:request) { -> { post '/stories', { story: invalid_story_attributes } } }
         let(:response) { request.call }
 
         it 'responds with code 422' do
