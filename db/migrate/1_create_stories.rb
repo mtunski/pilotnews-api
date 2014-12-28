@@ -1,12 +1,8 @@
 class CreateStories < ActiveRecord::Migration
-  def self.up
+  def change
     create_table :stories do |t|
       t.string :title
       t.string :url
     end
-  end
-
-  def self.down
-    drop_table :stories
   end
 end
