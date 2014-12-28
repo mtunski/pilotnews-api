@@ -75,6 +75,10 @@ describe PilotNews::API do
           expect(response.status).to eq(201)
         end
 
+        it 'contains `Location` header pointing to the newly created resource' do
+          expect(response.headers['Location']).to eq("/stories/#{Story.last.id}")
+        end
+
         it 'returns nothing' do
           expect(response.body).to be_empty
         end

@@ -14,7 +14,13 @@ module PilotNews
         end
 
         post '' do
-          status 201 if Story.create!(params[:story])
+          story = Story.new(params[:story])
+
+          if story.save!
+            status 201
+            headers 'Location' => "#{request.path_info}/#{story.id}"
+            body
+          end
         end
       end
     end
