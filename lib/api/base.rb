@@ -6,6 +6,8 @@ require 'sinatra/router'
 require 'dotenv'
 require 'active_record'
 
+require_relative 'helpers'
+
 module PilotNews
   module API
     class Base < Sinatra::Base
@@ -17,6 +19,8 @@ module PilotNews
 
         register Sinatra::Namespace
         helpers  Sinatra::JSON
+
+        helpers  Helpers::Authentication
       end
 
       error ActiveRecord::RecordNotFound do
@@ -29,6 +33,14 @@ module PilotNews
         content_type :json
 
         halt 422, { error: 'Resource invalid' }.to_json
+      end
+
+      error Helpers::Authentication::AuthenticationError do
+        content_type :json
+
+        halt 401,
+             { 'WWW-Authenticate' => 'Basic realm="Restricted Area"' },
+             { error: 'Authentication failed' }.to_json
       end
     end
   end

@@ -14,6 +14,8 @@ module PilotNews
         end
 
         post '' do
+          authenticate!
+
           story = Story.new(params[:story])
 
           if story.save!
