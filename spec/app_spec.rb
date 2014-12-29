@@ -14,8 +14,9 @@ describe PilotNews::API do
       run self
     end
   end
-  let(:resource_not_found) { { error: 'Resource not found' }.to_json }
-  let(:resource_invalid)   { { error: 'Resource invalid' }.to_json }
+  let(:resource_not_found)    { { error: 'Resource not found' }.to_json }
+  let(:resource_invalid)      { { error: 'Resource invalid' }.to_json }
+  let(:authentication_failed) { { error: 'Authentication failed' }.to_json }
 
   describe '::Stories' do
     let(:story_1) { Story.find(1) }
@@ -26,6 +27,7 @@ describe PilotNews::API do
     before do
       Story.create!(title: 'Lorem ipsum', url: 'http://www.lipsum.com/')
       Story.create!(title: 'Dolor sit amet', url: 'http://www.dsitamet.com/')
+      User.create!(login: 'test', password: 'test')
     end
 
     describe 'GET /stories' do
@@ -67,41 +69,62 @@ describe PilotNews::API do
     end
 
     describe 'POST /stories' do
-      context 'story is valid' do
-        let(:request) { -> { post '/stories', { story: valid_story_attributes } } }
+      context 'user is not authenticated' do
+        let(:request)  { -> { post '/stories', { story: valid_story_attributes } } }
         let(:response) { request.call }
 
-        it 'responds with code 201' do
-          expect(response.status).to eq(201)
-        end
-
-        it 'contains `Location` header pointing to the newly created resource' do
-          expect(response.headers['Location']).to eq("/stories/#{Story.last.id}")
-        end
-
-        it 'returns nothing' do
-          expect(response.body).to be_empty
-        end
-
-        it 'saves the story in the db' do
-          expect(request).to change{ Story.count }.by(1)
-        end
-      end
-
-      context 'story is invalid' do
-        let(:request) { -> { post '/stories', { story: invalid_story_attributes } } }
-        let(:response) { request.call }
-
-        it 'responds with code 422' do
-          expect(response.status).to eq(422)
+        it 'responds with code 401' do
+          expect(response.status).to eq(401)
         end
 
         it 'returns proper error message' do
-          expect(response.body).to eq(resource_invalid)
+          expect(response.body).to eq(authentication_failed)
         end
 
         it 'does not save the story in the db' do
           expect(request).not_to change{ Story.count }
+        end
+      end
+
+      context 'user is authenticated' do
+        before { authorize 'test', 'test' }
+
+        context 'story is valid' do
+          let(:request)  { -> { post '/stories', { story: valid_story_attributes } } }
+          let(:response) { request.call }
+
+          it 'responds with code 201' do
+            expect(response.status).to eq(201)
+          end
+
+          it 'contains `Location` header pointing to the newly created resource' do
+            expect(response.headers['Location']).to eq("/stories/#{Story.last.id}")
+          end
+
+          it 'returns nothing' do
+            expect(response.body).to be_empty
+          end
+
+          it 'saves the story in the db' do
+            expect(request).to change{ Story.count }.by(1)
+          end
+        end
+
+        context 'story is invalid' do
+          let(:request)  { -> { post '/stories', { story: invalid_story_attributes } } }
+          let(:response) { request.call }
+
+          it 'responds with code 422' do
+            expect(response.status).to eq(422)
+          end
+
+          it 'returns proper error message' do
+            expect(response.body).to eq(resource_invalid)
+          end
+
+          it 'does not save the story in the db' do
+            expect(request).not_to change{ Story.count }
+          end
         end
       end
     end
@@ -147,12 +170,12 @@ describe PilotNews::API do
   end
 
   describe '::Users' do
-    let(:valid_user) { { login: 'user', password: 'user' } }
-    let(:invalid_user) { { login: 'user', password: '1' } }
+    let(:valid_user_attributes)   { { login: 'user', password: 'user' } }
+    let(:invalid_user_attributes) { { login: 'user', password: '1' } }
 
     describe 'POST /users' do
       context 'user is valid' do
-        let(:request) { -> { post '/users', { user: valid_user } } }
+        let(:request)  { -> { post '/users', { user: valid_user_attributes } } }
         let(:response) { request.call }
 
         it 'responds with code 201' do
@@ -169,10 +192,10 @@ describe PilotNews::API do
       end
 
       context 'user is invalid' do
-        let(:request) { -> { post '/users', { user: invalid_user } } }
+        let(:request)  { -> { post '/users', { user: invalid_user_attributes } } }
         let(:response) { request.call }
 
-        before { User.create!(valid_user) }
+        before { User.create!(valid_user_attributes) }
 
         it 'responds with code 422' do
           expect(response.status).to eq(422)
