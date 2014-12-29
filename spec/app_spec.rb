@@ -1,19 +1,8 @@
 require 'spec_helper'
-require 'api/stories'
-require 'api/users'
+require 'application'
 
 describe PilotNews::API do
-  let(:app) do
-    Rack::Builder.new do
-      use Rack::Lint
-      use Sinatra::Router do
-        mount PilotNews::API::Stories
-        mount PilotNews::API::Users
-      end
-
-      run self
-    end
-  end
+  let(:app)                   { Rack::Lint.new(PilotNews::Application) }
   let(:resource_not_found)    { { error: 'Resource not found' }.to_json }
   let(:resource_invalid)      { { error: 'Resource invalid' }.to_json }
   let(:authentication_failed) { { error: 'Authentication failed' }.to_json }

@@ -1,9 +1,3 @@
-require_relative 'lib/api/stories'
-require_relative 'lib/api/users'
+require_relative 'lib/application'
 
-use Sinatra::Router do
-  mount PilotNews::API::Stories
-  mount PilotNews::API::Users
-end
-
-run Sinatra::Application
+run PilotNews::Application
