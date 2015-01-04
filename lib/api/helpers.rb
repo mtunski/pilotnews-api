@@ -2,7 +2,11 @@ module PilotNews
   module API
     module Helpers
       module Authentication
-        AuthenticationError = Class.new(StandardError)
+        class AuthenticationError < StandardError
+          def initialize(msg = 'Authentication failed')
+            super
+          end
+        end
 
         def authenticate!
           raise AuthenticationError unless authenticated?

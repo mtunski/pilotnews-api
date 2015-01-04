@@ -2,10 +2,7 @@ require 'spec_helper'
 require 'application'
 
 describe PilotNews::API do
-  let(:app)                   { Rack::Lint.new(PilotNews::Application) }
-  let(:resource_not_found)    { { error: 'Resource not found' }.to_json }
-  let(:resource_invalid)      { { error: 'Resource invalid' }.to_json }
-  let(:authentication_failed) { { error: 'Authentication failed' }.to_json }
+  let(:app) { Rack::Lint.new(PilotNews::Application) }
 
   describe '::Stories' do
     let(:story_1) { Story.find(1) }
@@ -52,7 +49,7 @@ describe PilotNews::API do
         end
 
         it 'returns proper error message' do
-          expect(last_response.body).to eq(resource_not_found)
+          expect(JSON.parse(last_response.body)['error']).to eq("Couldn't find Story with 'id'=0")
         end
       end
     end
@@ -71,7 +68,7 @@ describe PilotNews::API do
         end
 
         it 'returns proper error message' do
-          expect(response.body).to eq(authentication_failed)
+          expect(JSON.parse(response.body)['error']).to eq('Authentication failed')
         end
 
         it 'does not save the story in the db' do
@@ -112,7 +109,7 @@ describe PilotNews::API do
           end
 
           it 'returns proper error message' do
-            expect(response.body).to eq(resource_invalid)
+            expect(JSON.parse(response.body)['errors']).to eq({ 'title' => ["can't be blank"] })
           end
 
           it 'does not save the story in the db' do
@@ -195,7 +192,10 @@ describe PilotNews::API do
         end
 
         it 'returns proper error message' do
-          expect(response.body).to eq(resource_invalid)
+          expect(JSON.parse(response.body)['errors']).to eq({
+            'login'    => ['has already been taken'],
+            'password' => ['is too short (minimum is 3 characters)'],
+          })
         end
 
         it 'does not save the user in the db' do

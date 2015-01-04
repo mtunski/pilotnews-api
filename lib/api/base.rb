@@ -24,23 +24,19 @@ module PilotNews
       end
 
       error ActiveRecord::RecordNotFound do
-        content_type :json
-
-        halt 404, { error: 'Resource not found' }.to_json
+        status 404
+        json error: env['sinatra.error'].message
       end
 
       error ActiveRecord::RecordInvalid do
-        content_type :json
-
-        halt 422, { error: 'Resource invalid' }.to_json
+        status 422
+        json errors: env['sinatra.error'].record.errors
       end
 
       error Helpers::Authentication::AuthenticationError do
-        content_type :json
-
-        halt 401,
-             { 'WWW-Authenticate' => 'Basic realm="Restricted Area"' },
-             { error: 'Authentication failed' }.to_json
+        status 401
+        headers 'WWW-Authenticate' => 'Basic realm="Restricted Area"'
+        json error: env['sinatra.error'].message
       end
     end
   end
