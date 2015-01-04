@@ -66,6 +66,10 @@ describe PilotNews::API do
           expect(response.status).to eq(401)
         end
 
+        it 'contains `WWW-Authenticate` header' do
+          expect(response.headers['WWW-Authenticate']).to be_present
+        end
+
         it 'returns proper error message' do
           expect(response.body).to eq(authentication_failed)
         end
