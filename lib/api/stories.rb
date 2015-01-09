@@ -1,5 +1,6 @@
 require_relative 'base'
 require_relative '../models/story'
+require_relative '../models/vote'
 
 module PilotNews
   module API

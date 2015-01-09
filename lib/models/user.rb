@@ -5,6 +5,9 @@ class User < ActiveRecord::Base
 
   attr_accessor :password
 
+  has_many :stories, foreign_key: :poster_id
+  has_many :votes
+
   validates :login,    presence:   true,
                        uniqueness: true
   validates :password, length: { minimum: 3 }, on: :create
