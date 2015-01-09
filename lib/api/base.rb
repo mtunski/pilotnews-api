@@ -20,23 +20,23 @@ module PilotNews
         register Sinatra::Namespace
         helpers  Sinatra::JSON
 
-        helpers  Helpers::Authentication
+        helpers Helpers::Authentication
       end
 
       error ActiveRecord::RecordNotFound do
         status 404
-        json error: env['sinatra.error'].message
+        json   error: env['sinatra.error'].message
       end
 
       error ActiveRecord::RecordInvalid do
         status 422
-        json errors: env['sinatra.error'].record.errors
+        json   errors: env['sinatra.error'].record.errors
       end
 
       error Helpers::Authentication::AuthenticationError do
-        status 401
+        status  401
         headers 'WWW-Authenticate' => 'Basic realm="Restricted Area"'
-        json error: env['sinatra.error'].message
+        json    error: env['sinatra.error'].message
       end
     end
   end
