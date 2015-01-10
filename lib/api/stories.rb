@@ -17,7 +17,8 @@ module PilotNews
         post '' do
           authenticate!
 
-          story = Story.new(params[:story])
+          story        = Story.new(params[:story])
+          story.poster = current_user
 
           if story.save!
             status 201
