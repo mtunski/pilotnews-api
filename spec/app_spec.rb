@@ -7,13 +7,16 @@ describe PilotNews::API do
   describe '::Stories' do
     let(:story_1) { Story.find(1) }
     let(:story_2) { Story.find(2) }
+    let(:poster)  { User.find(1) }
+    let(:voter)   { User.find(2) }
     let(:valid_story_attributes)   { { title: 'Valid Story', url: 'http://validurl.com' } }
-    let(:invalid_story_attributes) { { title: '', url: 'invalidurl' } }
+    let(:invalid_story_attributes) { { title: '',            url: 'invalidurl' } }
 
     before do
-      Story.create!(title: 'Lorem ipsum', url: 'http://www.lipsum.com/')
-      Story.create!(title: 'Dolor sit amet', url: 'http://www.dsitamet.com/')
-      User.create!(login: 'test', password: 'test')
+      poster = User.create!(login: 'poster', password: 'test')
+      voter  = User.create!(login: 'voter',  password: 'test')
+      Story.create!(title: 'Lorem ipsum',    url: 'http://www.lipsum.com/',   poster: poster)
+      Story.create!(title: 'Dolor sit amet', url: 'http://www.dsitamet.com/', poster: poster)
     end
 
     describe 'GET /stories' do
@@ -77,7 +80,7 @@ describe PilotNews::API do
       end
 
       context 'user is authenticated' do
-        before { authorize 'test', 'test' }
+        before { authorize 'poster', 'test' }
 
         context 'story is valid' do
           let(:request)  { -> { post '/stories', { story: valid_story_attributes } } }
