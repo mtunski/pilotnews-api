@@ -3,5 +3,5 @@ class Story < ActiveRecord::Base
   has_many :votes
   has_many :voters, through: :votes, source: :user
 
-  validates :title, :url, presence: true
+  validates :title, :url, :poster, presence: true
 end
