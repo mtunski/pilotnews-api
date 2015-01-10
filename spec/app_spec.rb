@@ -129,33 +129,106 @@ describe PilotNews::API do
       expect(last_response.status).to eq(204)
     end
 
-    it 'PUT /stories/:id/vote upvotes a story' do
-      skip
+    describe 'PUT /stories/:id/vote' do
+      context 'user is not authenticated' do
+        let(:request)  { -> { put '/stories/1/vote', { value: 1 } } }
+        let(:response) { request.call }
 
-      story = {}
-      vote  = 1
+        it 'responds with code 401' do
+          expect(response.status).to eq(401)
+        end
 
-      put "/stories/#{story.id}/vote", { vote: vote }
-      expect(last_response.status).to eq(204)
+        it 'contains `WWW-Authenticate` header' do
+          expect(response.headers['WWW-Authenticate']).to be_present
+        end
+
+        it 'returns proper error message' do
+          expect(JSON.parse(response.body)['error']).to eq('Authentication failed')
+        end
+
+        it 'does not save the story in the db' do
+          expect(request).not_to change{ Vote.count }
+        end
+      end
+
+      context 'user is authenticated' do
+        before { authorize 'voter', 'test' }
+
+        describe 'upvoting' do
+          let(:request)  { -> { put '/stories/1/vote', { value: 1 } } }
+          let(:response) { request.call }
+
+          context 'vote does not exist in the db' do
+            it 'responds with code 201' do
+              expect(response.status).to eq(201)
+            end
+
+            it 'returns nothing' do
+              expect(response.body).to be_empty
+            end
+
+            it 'saves the vote in the db' do
+              expect(request).to change{ Vote.count }.by(1)
+            end
+          end
+
+          context 'vote exists in the db' do
+            before { Vote.create!(story: story_1, user: voter, value: -1) }
+
+            it 'responds with code 204' do
+              expect(response.status).to eq(204)
+            end
+
+            it 'returns nothing' do
+              expect(response.body).to be_empty
+            end
+
+            it 'updates the vote in the db' do
+              expect(request).not_to     change{ Vote.count }
+              expect(Vote.last.value).to eq(1)
+            end
+          end
+        end
+
+        describe 'downvoting' do
+          let(:request)  { -> { put '/stories/1/vote', { value: -1 } } }
+          let(:response) { request.call }
+
+          context 'vote does not exist in the db' do
+            it 'responds with code 201' do
+              expect(response.status).to eq(201)
+            end
+
+            it 'returns nothing' do
+              expect(response.body).to be_empty
+            end
+
+            it 'saves the vote in the db' do
+              expect(request).to change{ Vote.count }.by(1)
+            end
+          end
+
+          context 'vote exists in the db' do
+            before { Vote.create!(story: story_1, user: voter, value: 1) }
+
+            it 'responds with code 204' do
+              expect(response.status).to eq(204)
+            end
+
+            it 'returns nothing' do
+              expect(response.body).to be_empty
+            end
+
+            it 'updates the vote in the db' do
+              expect(request).not_to     change{ Vote.count }
+              expect(Vote.last.value).to eq(-1)
+            end
+          end
+        end
+      end
     end
 
-    it 'PUT /stories/:id/vote downvotes a story' do
-      skip
-
-      story = {}
-      vote  = -1
-
-      patch "/stories/#{story.id}/vote", { vote: vote }
-      expect(last_response.status).to eq(204)
-    end
-
-    it 'DELETE /stories/:id/vote undoes the vote' do
-      skip
-
-      story = {}
-
-      delete "/stories/#{story.id}/vote"
-      expect(last_response.status).to eq(204)
+    describe 'DELETE /stories/:id/vote' do
     end
   end
 
