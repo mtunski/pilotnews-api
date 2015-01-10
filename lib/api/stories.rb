@@ -25,6 +25,16 @@ module PilotNews
             body
           end
         end
+
+        put '/:id/vote' do
+          authenticate!
+
+          vote       = Vote.find_or_initialize_by(story_id: params[:id], user_id: current_user.id)
+          vote.value = params[:value]
+
+          vote.new_record? ? (status 201) : (status 204)
+          vote.save!
+        end
       end
     end
   end
