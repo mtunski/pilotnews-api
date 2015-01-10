@@ -157,74 +157,105 @@ describe PilotNews::API do
       context 'user is authenticated' do
         before { authorize 'voter', 'test' }
 
-        describe 'upvoting' do
-          let(:request)  { -> { put '/stories/1/vote', { value: 1 } } }
+        context 'vote is invalid' do
+          let(:request)  { -> { put '/stories/1/vote', { value: 0 } } }
           let(:response) { request.call }
 
-          context 'vote does not exist in the db' do
-            it 'responds with code 201' do
-              expect(response.status).to eq(201)
-            end
-
-            it 'returns nothing' do
-              expect(response.body).to be_empty
-            end
-
-            it 'saves the vote in the db' do
-              expect(request).to change{ Vote.count }.by(1)
-            end
+          it 'responds with code 422' do
+            expect(response.status).to eq(422)
           end
 
-          context 'vote exists in the db' do
-            before { Vote.create!(story: story_1, user: voter, value: -1) }
-
-            it 'responds with code 204' do
-              expect(response.status).to eq(204)
-            end
-
-            it 'returns nothing' do
-              expect(response.body).to be_empty
-            end
-
-            it 'updates the vote in the db' do
-              expect(request).not_to     change{ Vote.count }
-              expect(Vote.last.value).to eq(1)
-            end
+          it 'returns proper error message' do
+            expect(JSON.parse(response.body)['errors']).to eq({
+              'value' => ['Value can be either -1 (downvote) or 1 (upvote)']
+            })
           end
-        end
-
-        describe 'downvoting' do
-          let(:request)  { -> { put '/stories/1/vote', { value: -1 } } }
-          let(:response) { request.call }
 
           context 'vote does not exist in the db' do
-            it 'responds with code 201' do
-              expect(response.status).to eq(201)
-            end
-
-            it 'returns nothing' do
-              expect(response.body).to be_empty
-            end
-
-            it 'saves the vote in the db' do
-              expect(request).to change{ Vote.count }.by(1)
+            it 'does not save the vote in the db' do
+              expect(request).not_to change{ Vote.count }
             end
           end
 
           context 'vote exists in the db' do
             before { Vote.create!(story: story_1, user: voter, value: 1) }
 
-            it 'responds with code 204' do
-              expect(response.status).to eq(204)
+            it 'does not update the vote in the db' do
+              expect(Vote.last.value).to eq(1)
+            end
+          end
+        end
+
+        context 'vote is valid' do
+          describe 'upvoting' do
+            let(:request)  { -> { put '/stories/1/vote', { value: 1 } } }
+            let(:response) { request.call }
+
+            context 'vote does not exist in the db' do
+              it 'responds with code 201' do
+                expect(response.status).to eq(201)
+              end
+
+              it 'returns nothing' do
+                expect(response.body).to be_empty
+              end
+
+              it 'saves the vote in the db' do
+                expect(request).to change{ Vote.count }.by(1)
+              end
             end
 
-            it 'returns nothing' do
-              expect(response.body).to be_empty
+            context 'vote exists in the db' do
+              before { Vote.create!(story: story_1, user: voter, value: -1) }
+
+              it 'responds with code 204' do
+                expect(response.status).to eq(204)
+              end
+
+              it 'returns nothing' do
+                expect(response.body).to be_empty
+              end
+
+              it 'updates the vote in the db' do
+                expect(request).not_to     change{ Vote.count }
+                expect(Vote.last.value).to eq(1)
+              end
+            end
+          end
+
+          describe 'downvoting' do
+            let(:request)  { -> { put '/stories/1/vote', { value: -1 } } }
+            let(:response) { request.call }
+
+            context 'vote does not exist in the db' do
+              it 'responds with code 201' do
+                expect(response.status).to eq(201)
+              end
+
+              it 'returns nothing' do
+                expect(response.body).to be_empty
+              end
+
+              it 'saves the vote in the db' do
+                expect(request).to change{ Vote.count }.by(1)
+              end
             end
 
-            it 'updates the vote in the db' do
-              expect(request).not_to     change{ Vote.count }
-              expect(Vote.last.value).to eq(-1)
+            context 'vote exists in the db' do
+              before { Vote.create!(story: story_1, user: voter, value: 1) }
+
+              it 'responds with code 204' do
+                expect(response.status).to eq(204)
+              end
+
+              it 'returns nothing' do
+                expect(response.body).to be_empty
+              end
+
+              it 'updates the vote in the db' do
+                expect(request).not_to     change{ Vote.count }
+                expect(Vote.last.value).to eq(-1)
+              end
             end
           end
         end
