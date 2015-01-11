@@ -191,7 +191,7 @@ describe PilotNews::API do
             before { Vote.create!(story: story_1, user: voter, value: 1) }
 
             it 'does not update the vote in the db' do
-              expect(Vote.last.value).to eq(1)
+              expect(request).not_to change{ Vote.last.value }
             end
           end
         end
