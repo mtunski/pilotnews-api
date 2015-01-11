@@ -29,6 +29,12 @@ describe PilotNews::API do
       it 'returns all stories' do
         expect(last_response.body).to eq([story_1, story_2].to_json)
       end
+
+      it 'attaches the score to each story' do
+        stories = JSON.parse(last_response.body)
+        expect(stories[0]['score']).to be_present
+        expect(stories[1]['score']).to be_present
+      end
     end
 
     describe 'GET /stories/:id' do
@@ -41,6 +47,10 @@ describe PilotNews::API do
 
         it 'returns the story with given id' do
           expect(last_response.body).to eq(story_1.to_json)
+        end
+
+        it 'attaches score to the story' do
+          expect(JSON.parse(last_response.body)['score']).to be_present
         end
       end
 
