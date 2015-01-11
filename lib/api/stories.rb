@@ -36,6 +36,14 @@ module PilotNews
           vote.new_record? ? (status 201) : (status 204)
           vote.save!
         end
+
+        delete '/:id/vote' do
+          authenticate!
+
+          Vote.find_by!(story_id: params[:id], user_id: current_user.id).destroy
+
+          status 204
+        end
       end
     end
   end

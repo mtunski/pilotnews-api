@@ -273,6 +273,66 @@ describe PilotNews::API do
     end
 
     describe 'DELETE /stories/:id/vote' do
+      let(:request)  { -> { delete '/stories/1/vote' } }
+      let(:response) { request.call }
+
+      context 'user is not authenticated' do
+        it 'responds with code 401' do
+          expect(response.status).to eq(401)
+        end
+
+        it 'contains `WWW-Authenticate` header' do
+          expect(response.headers['WWW-Authenticate']).to be_present
+        end
+
+        it 'returns proper error message' do
+          expect(JSON.parse(response.body)['error']).to eq('Authentication failed')
+        end
+
+        it 'does not delete the vote from the db' do
+          expect(request).not_to change{ Vote.count }
+        end
+      end
+
+      context 'user is authenticated' do
+        before { authorize 'voter', 'test' }
+
+        context "user's vote does not exist" do
+          it 'responds with code 404' do
+            expect(response.status).to eq(404)
+          end
+
+          it 'returns proper error message' do
+            expect(JSON.parse(response.body)['error']).to eq('ActiveRecord::RecordNotFound')
+          end
+
+          it 'does not delete any votes from the db' do
+            expect(request).not_to change{ Vote.count }
+          end
+        end
+
+        context "user's vote exists" do
+          before { Vote.create!(story: story_1, user: voter, value: 1) }
+
+          it 'responds with code 204' do
+            expect(response.status).to eq(204)
+          end
+
+          it 'returns nothing' do
+            expect(response.body).to be_empty
+          end
+
+          it 'removes the vote from the db' do
+            expect(request).to             change{ Vote.count }.by(-1)
+            expect(story_1.votes.count).to eq(0)
+            expect(voter.votes.count).to   eq(0)
+          end
+
+          it "updates the story's score" do
+            expect(request).to change{ story_1.score }.by(-1)
+          end
+        end
+      end
     end
   end
 
