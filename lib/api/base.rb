@@ -33,9 +33,14 @@ module PilotNews
         json   errors: env['sinatra.error'].record.errors
       end
 
-      error Helpers::Authentication::AuthenticationError do
+      error AuthenticationError do
         status  401
         headers 'WWW-Authenticate' => 'Basic realm="Restricted Area"'
+        json    error: env['sinatra.error'].message
+      end
+
+      error AuthorizationError do
+        status  403
         json    error: env['sinatra.error'].message
       end
     end

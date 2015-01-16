@@ -8,6 +8,12 @@ module PilotNews
           end
         end
 
+        class AuthorizationError < StandardError
+          def initialize(msg = 'Unauthorized')
+            super
+          end
+        end
+
         def authenticate!
           raise AuthenticationError unless authenticated?
         end
