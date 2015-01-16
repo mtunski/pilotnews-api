@@ -27,6 +27,20 @@ module PilotNews
           end
         end
 
+        patch '/:id' do
+          authenticate!
+
+          story = Story.find(params[:id])
+
+          if current_user == story.poster
+            story.update_attributes!(title: params[:title], url: params[:url])
+          else
+            raise AuthorizationError, 'You can only update your own stories'
+          end
+
+          status 204
+        end
+
         put '/:id/vote' do
           authenticate!
 
