@@ -44,7 +44,7 @@ module PilotNews
         put '/:id/vote' do
           authenticate!
 
-          vote       = Vote.find_or_initialize_by(story_id: params[:id], user_id: current_user.id)
+          vote       = Vote.find_or_initialize_by(story: Story.find(params[:id]), user: current_user)
           vote.value = params[:value]
 
           vote.new_record? ? (status 201) : (status 204)
@@ -54,7 +54,7 @@ module PilotNews
         delete '/:id/vote' do
           authenticate!
 
-          Vote.find_by!(story_id: params[:id], user_id: current_user.id).destroy
+          Vote.find_by!(story_id: params[:id], user: current_user).destroy
 
           status 204
         end
