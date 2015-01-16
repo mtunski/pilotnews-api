@@ -28,7 +28,7 @@ module PilotNews
           auth = Rack::Auth::Basic::Request.new(request.env)
 
           if auth.provided? && auth.basic? && auth.credentials
-            @user = User.find_by(login: auth.credentials.first)
+            @user = User.find_by!(login: auth.credentials.first)
 
             return [@user.login, @user.password] == auth.credentials
           end
