@@ -14,6 +14,10 @@ module PilotNews
           respond_with Story.find(params[:id])
         end
 
+        get '/:id/url' do
+          redirect Story.find(params[:id]).url, 303
+        end
+
         post '' do
           authenticate!
 

@@ -106,6 +106,22 @@ describe PilotNews::API do
       end
     end
 
+    describe 'GET /stories/:id/url' do
+      before { get '/stories/1/url' }
+
+      it 'is a redirection' do
+        expect(last_response).to be_redirect
+      end
+
+      it 'responds with code 303' do
+        expect(last_response.status).to eq(303)
+      end
+
+      it 'redirects to proper location' do
+        expect(last_response.location).to eq(story_1.url)
+      end
+    end
+
     describe 'POST /stories' do
       context 'user is not authenticated' do
         let(:request)  { -> { post '/stories', { story: valid_story_attributes } } }
