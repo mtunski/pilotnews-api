@@ -7,11 +7,11 @@ module PilotNews
     class Stories < Base
       namespace '/stories' do
         get '' do
-          json Story.all
+          respond_with Story.all
         end
 
         get '/:id' do
-          json Story.find(params[:id])
+          respond_with Story.find(params[:id])
         end
 
         post '' do

@@ -20,20 +20,59 @@ describe PilotNews::API do
     end
 
     describe 'GET /stories' do
-      before { get '/stories' }
+      context 'no "Accept" header provided' do
+        before { get '/stories' }
 
-      it 'responds with code 200' do
-        expect(last_response.status).to eq(200)
+        it 'responds with code 200' do
+          expect(last_response.status).to eq(200)
+        end
+
+        it 'returns all stories (defaults to JSON)' do
+          expect(last_response.body).to eq([story_1, story_2].to_json)
+        end
+
+        it 'attaches the score to each story' do
+          stories = JSON.parse(last_response.body)
+          expect(stories[0]['score']).to be_present
+          expect(stories[1]['score']).to be_present
+        end
       end
 
-      it 'returns all stories' do
-        expect(last_response.body).to eq([story_1, story_2].to_json)
-      end
+      context 'specific "Accept" header provided' do
+        context 'media type is supported' do
+          it 'returns all stories (JSON)' do
+            header 'Accept', 'application/json'
+            get    '/stories'
+            expect(last_response.body).to eq([story_1, story_2].to_json)
+          end
 
-      it 'attaches the score to each story' do
-        stories = JSON.parse(last_response.body)
-        expect(stories[0]['score']).to be_present
-        expect(stories[1]['score']).to be_present
+          it 'returns all stories (XML)' do
+            header 'Accept', 'application/xml'
+            get    '/stories'
+            expect(last_response.body).to eq([story_1, story_2].to_xml)
+          end
+
+          it 'returns all stories with respect to -q param' do
+            header 'Accept', 'application/json; q=1, application/xml'
+            get    '/stories'
+            expect(last_response.body).to eq([story_1, story_2].to_json)
+          end
+        end
+
+        context 'media type is not supported' do
+          before do
+            header 'Accept', 'application/test'
+            get    '/stories'
+          end
+
+          it 'responds with code 404' do
+            expect(last_response.status).to eq(404)
+          end
+
+          it 'returns proper error message' do
+            expect(last_response.body).to eq('<h1>Not Found</h1>')
+          end
+        end
       end
     end
 
