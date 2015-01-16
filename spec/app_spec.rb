@@ -132,14 +132,81 @@ describe PilotNews::API do
       end
     end
 
-    it 'PATCH /stories/:id updates a story' do
-      skip
+    describe 'PATCH /stories/:id' do
+      let(:request)  { -> { patch '/stories/1', { title: 'Title', url: 'Url' } } }
+      let(:response) { request.call }
 
-      story = {}
-      attributes = {}
+      context 'user is not authenticated' do
+        it 'responds with code 401' do
+          expect(response.status).to eq(401)
+        end
 
-      patch "/stories/#{story.id}", { attributes: attributes }
-      expect(last_response.status).to eq(204)
+        it 'contains `WWW-Authenticate` header' do
+          expect(response.headers['WWW-Authenticate']).to be_present
+        end
+
+        it 'returns proper error message' do
+          expect(JSON.parse(response.body)['error']).to eq('Authentication failed')
+        end
+      end
+
+      context 'user is authenticated' do
+        context 'user did not post the story' do
+          before { authorize 'voter', 'test' }
+
+          it 'responds with code 403' do
+            expect(response.status).to eq(403)
+          end
+
+          it 'returns proper error message' do
+            expect(JSON.parse(response.body)['error']).to eq('You can only update your own stories')
+          end
+
+          it 'does not update the story' do
+            expect(request).not_to change{ Story.first.title && Story.first.url }
+          end
+        end
+
+        context 'user posted the story' do
+          before { authorize 'poster', 'test' }
+
+          context 'story params are invalid' do
+            let(:request)  { -> { patch '/stories/1', { title: '', url: '' } } }
+            let(:response) { request.call }
+
+            it 'responds with code 422' do
+              expect(response.status).to eq(422)
+            end
+
+            it 'returns proper error message' do
+              expect(JSON.parse(response.body)['errors']).to eq({
+                'title' => ["can't be blank"],
+                'url'   => ["can't be blank"]
+              })
+            end
+
+            it 'does not update the story' do
+              expect(request).not_to change{ Story.first.title && Story.first.url }
+            end
+          end
+
+          context 'story params are valid' do
+            it 'responds with code 204' do
+              expect(response.status).to eq(204)
+            end
+
+            it 'returns nothing' do
+              expect(response.body).to be_empty
+            end
+
+            it 'updates the story' do
+              expect(request).to change{ Story.first.title && Story.first.url }
+              expect(story_1.title).to eq('Title')
+              expect(story_1.url).to   eq('Url')
+            end
+          end
+        end
+      end
     end
 
     describe 'PUT /stories/:id/vote' do
@@ -159,7 +226,7 @@ describe PilotNews::API do
           expect(JSON.parse(response.body)['error']).to eq('Authentication failed')
         end
 
-        it 'does not save the story in the db' do
+        it 'does not save the vote in the db' do
           expect(request).not_to change{ Vote.count }
         end
       end
