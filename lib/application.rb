@@ -1,5 +1,8 @@
-require_relative 'api/stories'
-require_relative 'api/users'
+require_relative 'api/v1/stories'
+require_relative 'api/v1/users'
+
+require_relative 'api/v2/users'
+require_relative 'api/v2/stories'
 
 module PilotNews
   class Application < Sinatra::Base

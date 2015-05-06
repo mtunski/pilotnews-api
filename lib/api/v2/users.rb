@@ -1,10 +1,10 @@
-require_relative 'base'
-require_relative '../models/user'
+require_relative '../base'
+require_relative '../../models/user'
 
 module PilotNews
   module API
     class Users < Base
-      namespace '/users' do
+      namespace '/v2/users' do
         post '' do
           status 201 if User.create!(params[:user])
         end

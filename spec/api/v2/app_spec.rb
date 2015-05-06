@@ -21,7 +21,7 @@ describe PilotNews::API do
 
     describe 'GET /stories' do
       context 'no "Accept" header provided' do
-        before { get '/stories' }
+        before { get '/v2/stories' }
 
         it 'responds with code 200' do
           expect(last_response.status).to eq(200)
@@ -42,19 +42,19 @@ describe PilotNews::API do
         context 'media type is supported' do
           it 'returns all stories (JSON)' do
             header 'Accept', 'application/json'
-            get    '/stories'
+            get    '/v2/stories'
             expect(last_response.body).to eq([story_1, story_2].to_json)
           end
 
           it 'returns all stories (XML)' do
             header 'Accept', 'application/xml'
-            get    '/stories'
+            get    '/v2/stories'
             expect(last_response.body).to eq([story_1, story_2].to_xml)
           end
 
           it 'returns all stories with respect to -q param' do
             header 'Accept', 'application/json; q=1, application/xml'
-            get    '/stories'
+            get    '/v2/stories'
             expect(last_response.body).to eq([story_1, story_2].to_json)
           end
         end
@@ -62,7 +62,7 @@ describe PilotNews::API do
         context 'media type is not supported' do
           before do
             header 'Accept', 'application/test'
-            get    '/stories'
+            get    '/v2/stories'
           end
 
           it 'responds with code 404' do
@@ -78,7 +78,7 @@ describe PilotNews::API do
 
     describe 'GET /stories/:id' do
       context 'story found' do
-        before { get '/stories/1' }
+        before { get '/v2/stories/1' }
 
         it 'responds with code 200' do
           expect(last_response.status).to eq(200)
@@ -94,7 +94,7 @@ describe PilotNews::API do
       end
 
       context 'story not found' do
-        before { get '/stories/0' }
+        before { get '/v2/stories/0' }
 
         it 'responds with code 404' do
           expect(last_response.status).to eq(404)
@@ -107,7 +107,7 @@ describe PilotNews::API do
     end
 
     describe 'GET /stories/:id/url' do
-      before { get '/stories/1/url' }
+      before { get '/v2/stories/1/url' }
 
       it 'is a redirection' do
         expect(last_response).to be_redirect
@@ -124,7 +124,7 @@ describe PilotNews::API do
 
     describe 'POST /stories' do
       context 'user is not authenticated' do
-        let(:request)  { -> { post '/stories', { story: valid_story_attributes } } }
+        let(:request)  { -> { post '/v2/stories', { story: valid_story_attributes } } }
         let(:response) { request.call }
 
         it 'responds with code 401' do
@@ -148,7 +148,7 @@ describe PilotNews::API do
         before { authorize 'poster', 'test' }
 
         context 'story is valid' do
-          let(:request)  { -> { post '/stories', { story: valid_story_attributes } } }
+          let(:request)  { -> { post '/v2/stories', { story: valid_story_attributes } } }
           let(:response) { request.call }
 
           it 'responds with code 201' do
@@ -156,7 +156,7 @@ describe PilotNews::API do
           end
 
           it 'contains `Location` header pointing to the newly created resource' do
-            expect(response.headers['Location']).to eq("/stories/#{Story.last.id}")
+            expect(response.headers['Location']).to eq("/v2/stories/#{Story.last.id}")
           end
 
           it 'returns nothing' do
@@ -169,7 +169,7 @@ describe PilotNews::API do
         end
 
         context 'story is invalid' do
-          let(:request)  { -> { post '/stories', { story: invalid_story_attributes } } }
+          let(:request)  { -> { post '/v2/stories', { story: invalid_story_attributes } } }
           let(:response) { request.call }
 
           it 'responds with code 422' do
@@ -188,7 +188,7 @@ describe PilotNews::API do
     end
 
     describe 'PATCH /stories/:id' do
-      let(:request)  { -> { patch '/stories/1', { title: 'Title', url: 'Url' } } }
+      let(:request)  { -> { patch '/v2/stories/1', { title: 'Title', url: 'Url' } } }
       let(:response) { request.call }
 
       context 'user is not authenticated' do
@@ -226,7 +226,7 @@ describe PilotNews::API do
           before { authorize 'poster', 'test' }
 
           context 'story params are invalid' do
-            let(:request)  { -> { patch '/stories/1', { title: '', url: '' } } }
+            let(:request)  { -> { patch '/v2/stories/1', { title: '', url: '' } } }
             let(:response) { request.call }
 
             it 'responds with code 422' do
@@ -266,7 +266,7 @@ describe PilotNews::API do
 
     describe 'PUT /stories/:id/vote' do
       context 'user is not authenticated' do
-        let(:request)  { -> { put '/stories/1/vote', { value: 1 } } }
+        let(:request)  { -> { put '/v2/stories/1/vote', { value: 1 } } }
         let(:response) { request.call }
 
         it 'responds with code 401' do
@@ -290,7 +290,7 @@ describe PilotNews::API do
         before { authorize 'voter', 'test' }
 
         context 'vote is invalid' do
-          let(:request)  { -> { put '/stories/1/vote', { value: 0 } } }
+          let(:request)  { -> { put '/v2/stories/1/vote', { value: 0 } } }
           let(:response) { request.call }
 
           it 'responds with code 422' do
@@ -320,7 +320,7 @@ describe PilotNews::API do
 
         context 'vote is valid' do
           describe 'upvoting' do
-            let(:request)  { -> { put '/stories/1/vote', { value: 1 } } }
+            let(:request)  { -> { put '/v2/stories/1/vote', { value: 1 } } }
             let(:response) { request.call }
 
             context 'vote does not exist in the db' do
@@ -356,7 +356,7 @@ describe PilotNews::API do
           end
 
           describe 'downvoting' do
-            let(:request)  { -> { put '/stories/1/vote', { value: -1 } } }
+            let(:request)  { -> { put '/v2/stories/1/vote', { value: -1 } } }
             let(:response) { request.call }
 
             context 'vote does not exist in the db' do
@@ -395,7 +395,7 @@ describe PilotNews::API do
     end
 
     describe 'DELETE /stories/:id/vote' do
-      let(:request)  { -> { delete '/stories/1/vote' } }
+      let(:request)  { -> { delete '/v2/stories/1/vote' } }
       let(:response) { request.call }
 
       context 'user is not authenticated' do
@@ -464,7 +464,7 @@ describe PilotNews::API do
 
     describe 'POST /users' do
       context 'user is valid' do
-        let(:request)  { -> { post '/users', { user: valid_user_attributes } } }
+        let(:request)  { -> { post '/v2/users', { user: valid_user_attributes } } }
         let(:response) { request.call }
 
         it 'responds with code 201' do
@@ -481,7 +481,7 @@ describe PilotNews::API do
       end
 
       context 'user is invalid' do
-        let(:request)  { -> { post '/users', { user: invalid_user_attributes } } }
+        let(:request)  { -> { post '/v2/users', { user: invalid_user_attributes } } }
         let(:response) { request.call }
 
         before { User.create!(valid_user_attributes) }

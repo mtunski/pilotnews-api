@@ -1,11 +1,11 @@
-require_relative 'base'
-require_relative '../models/story'
-require_relative '../models/vote'
+require_relative '../base'
+require_relative '../../models/story'
+require_relative '../../models/vote'
 
 module PilotNews
   module API
     class Stories < Base
-      namespace '/stories' do
+      namespace '/v2/stories' do
         get '' do
           respond_with Story.all
         end
