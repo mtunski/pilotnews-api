@@ -3,6 +3,7 @@ require 'sinatra/namespace'
 require 'sinatra/json'
 require 'sinatra/respond_with'
 require 'sinatra/router'
+require 'sinatra/multi_route'
 
 require 'dotenv'
 require 'active_record'
@@ -11,6 +12,8 @@ require_relative 'helpers'
 
 module PilotNews
   module API
+    ALLOWED_METHODS = %i(get post delete patch put head options)
+
     class Base < Sinatra::Base
       configure do
         Dotenv.load(".env.#{environment}", '.env')
@@ -20,6 +23,7 @@ module PilotNews
 
         register Sinatra::Namespace
         register Sinatra::RespondWith
+        register Sinatra::MultiRoute
         helpers  Sinatra::JSON
 
         helpers Helpers::Authentication

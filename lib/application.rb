@@ -1,3 +1,6 @@
+require_relative 'api/legacy/stories'
+require_relative 'api/legacy/users'
+
 require_relative 'api/v1/stories'
 require_relative 'api/v1/users'
 
