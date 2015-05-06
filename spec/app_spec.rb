@@ -425,7 +425,7 @@ describe PilotNews::API do
           end
 
           it 'returns proper error message' do
-            expect(JSON.parse(response.body)['error']).to eq('ActiveRecord::RecordNotFound')
+            expect(JSON.parse(response.body)['error']).to eq("Couldn't find Vote")
           end
 
           it 'does not delete any votes from the db' do
